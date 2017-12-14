@@ -112,7 +112,6 @@ class DQN(object):
         next_state_batch = np.array([data[3] for data in minibatch])
 
         state_batch_var = Variable(torch.from_numpy(state_batch))
-        next_state_batch_var = Variable(torch.from_numpy(next_state_batch),volatile=True)
         q_value_next = self.model(next_state_batch_var)
         q_value = self.model(state_batch_var)
         y = reward_batch.astype(np.float32)
