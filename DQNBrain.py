@@ -39,10 +39,9 @@ class DQNBrain(nn.Module):
         #pytorch network
         self.conv1 = nn.Conv2d(4, 32, kernel_size=8, stride=4, padding=2)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1)
-        self.map_size = (64, 16, 9)
+        self.map_size = (64, 10, 10)
         self.fc1 = nn.Linear(self.map_size[0]*self.map_size[1]*self.map_size[2], 256)
         self.fc2 = nn.Linear(256, self.actions)
-        return model
 
     def forward(self, x):
         x = F.relu(self.conv1(x), inplace=True)
@@ -74,7 +73,7 @@ class DQNBrain(nn.Module):
         return action 
 
     def store_transition(self, o_next, action, reward, terminal):
-        next_state = np.append(self.currt_state[1:,:,:], np.reshape(o_next,(1,o_next.shape[0],o_next.shape[1])), axis=0)
+        next_state = np.append(self.currt_state[1:,:,:], o_next, axis=0)
         self.replayMemory.append((self.currt_state, action, reward, next_state, terminal))
         if len(self.replayMemory) > self.mem_size:
             self.replayMemory.popleft()

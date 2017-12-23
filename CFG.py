@@ -14,6 +14,7 @@ class CFG(object):
     time_step = 0
     init_e = 1
     final_e = 0.1
+    epsilon = 1
     gamma = 0.99
     exploration = 50000
 

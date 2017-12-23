@@ -2,6 +2,9 @@
 #coding:utf-8
 #Author:thewang93@gmail.com
 
+import cv2
+import numpy as np
+
 #convert image to a 80*80 gray image
 def preprocess(observation):
     img = cv2.resize(observation, (80, 80))
