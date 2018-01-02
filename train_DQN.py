@@ -1,5 +1,5 @@
 #!/bin/env python3
-#coding:utf-
+#coding:utf-8
 #Author:thewang93@gmail.com
 
 from CFG import CFG 
@@ -97,7 +97,54 @@ def train_DQN():
             optimizer.step()
             #end episode when bird's dead
             if terminal:
+                dqn.time_step = 0
                 break
+
+        #update epsilon
+        if dqn.epsilon > cfg.final_e:
+            delta = (cfg.init_e - cfg.final_e)/cfg.exploration
+            dqn.epsilon -= delta
+
+        #test dqn per 100 episode
+        if episode % 100 == 0:
+            ave_step = test_DQN(dqn, episode)
+
+        
+        #if ave_step > best_time_step:
+        #    best_time_step = ave_step
+        #`    save_checkpoint({
+
+
+def test_DQN(dqn, episode):
+    """
+    test DQN model
+    param dqn: dqn model
+    param episode: current episode
+    """
+    #test on 5 games
+    case_num = 5
+
+    dqn.close_train()
+    ave_step = 0
+    for i in range(case_num):
+        dqn.time_step = 0
+        flappyBird = game.GameState()
+        o, r, terminal = flappyBird.frame_step([1,0])
+        o = preprocess(o)
+        dqn.reset_state()
+        #play game until game end
+        while True:
+            action = dqn.get_action_optim()
+            o, r, terminal = flappyBird.frame_step(action)
+            if terminal:
+                break #game over
+            o = preprocess(o)
+            dqn.currt_state = np.append(dqn.currt_state[1:,:,:], o, axis=0)
+            dqn.increase_step()
+        ave_step += dqn.time_step
+    ave_step = ave_step / case_num
+    print("episode:{}, average game steps:{}".format(episode, ave_step))
+    return ave_step
 
 
 if __name__ == '__main__':

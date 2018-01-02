@@ -20,6 +20,7 @@ class DQNBrain(nn.Module):
         super(DQNBrain, self).__init__()
         #init all hyper parameters
         self.time_step = 0
+        self.actions = cfg.actions
         self.epsilon = cfg.epsilon
         self.mem_size = cfg.mem_size 
         self.use_cuda = cfg.use_cuda 
@@ -60,15 +61,15 @@ class DQNBrain(nn.Module):
 
     def get_action_optim(self):
         #get action by Q net
-        state = self.current_state
+        state = self.currt_state
         state_var = Variable(torch.from_numpy(state), volatile=True).unsqueeze(0)
         if self.use_cuda:
             state_var = state_var.cuda()
 
         q_value = self.forward(state_var)
         _, action_index = torch.max(q_value, dim=1)
-        action_index = action_index.data[0][0]
-        action = np.zeros(self.cfg.actions, dtype=np.float32)
+        action_index = action_index.data[0]
+        action = np.zeros(self.actions, dtype=np.float32)
         action[action_index] = 1
         return action 
 
@@ -86,7 +87,7 @@ class DQNBrain(nn.Module):
         self.is_training = False
 
     def reset_state(self):
-        self.currt_state = empty_state
+        self.currt_state = self.empty_state
 
     def increase_step(self, time_step=1):
         self.time_step += time_step
